@@ -20,7 +20,7 @@
     "commands": {
         "copy-text": {
             "suggested_key": {
-                "default": "Ctrl+Shift+C"
+                "default": "Alt+C"
             },
             "description": "Copy text to clipboard"
         },

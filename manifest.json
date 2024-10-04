@@ -33,7 +33,7 @@
         },
         "image": {
             "suggested_key": {
-                "default": "Alt+K"
+                "default": "Alt+I"
             },
             "description": "Copy Image to clipboard"
         }

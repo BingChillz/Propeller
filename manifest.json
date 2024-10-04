@@ -20,7 +20,7 @@
     "commands": {
         "copy-text": {
             "suggested_key": {
-                "default": "Alt+C"
+                "default": "Ctrl+Shift+C"
             },
             "description": "Copy text to clipboard"
         },
@@ -32,7 +32,7 @@
         },
         "image": {
             "suggested_key": {
-                "default": "Alt+I"
+                "default": "Alt+K"
             },
             "description": "Copy Image to clipboard"
         }

@@ -17,6 +17,7 @@
     "background": {
         "service_worker": "background.js"
     },
+    "host_permissions": ["http://*/*", "https://*/*"],
     "commands": {
         "copy-text": {
             "suggested_key": {

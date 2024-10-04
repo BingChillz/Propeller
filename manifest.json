@@ -21,13 +21,13 @@
     "commands": {
         "copy-text": {
             "suggested_key": {
-                "default": "Alt+C"
+                "default": "Alt+Shift+C"
             },
             "description": "Copy text to clipboard"
         },
         "copy-mcq": {
             "suggested_key": {
-                "default": "Alt+X"
+                "default": "Alt+Shift+X"
             },
             "description": "Copy MCQ to clipboard"
         },

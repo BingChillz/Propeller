@@ -46,6 +46,9 @@
       "image-snip": {
         "description": "Image Snip"
       }
+      "paste-swapping": {
+        "description": "Paste Swap"
+      }
     },
     "background": {
       "service_worker": "background.js"

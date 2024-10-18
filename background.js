@@ -116,6 +116,8 @@ chrome.commands.onCommand.addListener((command) => {
       chrome.tabs.sendMessage(tab.id, { type: 'copy-selected-text' });
     } else if (command === "simulate-paste") {
       chrome.tabs.sendMessage(tab.id, { type: 'simulate-paste' });
+    } else if (command === "image-snip") {
+      chrome.tabs.sendMessage(tab.id, { type: 'start-snip' });
     }
   });
 });

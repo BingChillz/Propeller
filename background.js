@@ -1,124 +1,177 @@
-chrome.commands.onCommand.addListener((command) => {
-    if (command === "copy-text") {
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            chrome.scripting.executeScript({
-                target: { tabId: tabs[0].id },
-                function: sendClipboardDataToServer,
-                args: ['https://propel.ziqfm.com/chat']
-            });
-        });
-    } else if (command === "copy-mcq") {
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            chrome.scripting.executeScript({
-                target: { tabId: tabs[0].id },
-                function: sendClipboardDataToServer,
-                args: ['https://propel.ziqfm.com/mcq']
-            });
-        });
-    } else if (command === "image") {
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            chrome.scripting.executeScript({
-                target: { tabId: tabs[0].id },
-                function: sendClipboardImageToServer,
-                args: ['https://propel.ziqfm.com/image']
-            });
-        });
-    } 
+// background.js
+
+const apiKey = 'thiLgXR1Sg6sUqQOaAfDy5V7mWg8j4UUnoNV0kv8xBGfSI9zMZgk2GFa'; // Replace with your actual API key
+
+// Create context menu items
+function createContextMenus() {
+  chrome.contextMenus.removeAll(() => {
+    // Parent menu
+    chrome.contextMenus.create({
+      id: 'propeller',
+      title: 'Propeller',
+      contexts: ['all']
+    });
+
+    // Child menus under Propeller
+    chrome.contextMenus.create({
+      id: 'solve-mcq',
+      parentId: 'propeller',
+      title: 'Solve MCQ (Alt + X)',
+      contexts: ['all']
+    });
+
+    chrome.contextMenus.create({
+      id: 'search-code',
+      parentId: 'propeller',
+      title: 'Search Code (Alt + G)',
+      contexts: ['all']
+    });
+
+    chrome.contextMenus.create({
+      id: 'search-normal',
+      parentId: 'propeller',
+      title: 'Search Normal',
+      contexts: ['all']
+    });
+
+    chrome.contextMenus.create({
+      id: 'copy-selected-text',
+      parentId: 'propeller',
+      title: 'Copy (Alt + C)',
+      contexts: ['all']
+    });
+
+    chrome.contextMenus.create({
+      id: 'paste-menu',
+      parentId: 'propeller',
+      title: 'Paste',
+      contexts: ['all']
+    });
+
+    // Submenu under Paste
+    chrome.contextMenus.create({
+      id: 'paste-typing',
+      parentId: 'paste-menu',
+      title: 'Paste clipboard by typing',
+      contexts: ['all']
+    });
+
+    chrome.contextMenus.create({
+      id: 'paste-swapping',
+      parentId: 'paste-menu',
+      title: 'Paste by swapping',
+      contexts: ['all']
+    });
+
+    chrome.contextMenus.create({
+      id: 'image-snip',
+      parentId: 'propeller',
+      title: 'Image Snip',
+      contexts: ['all']
+    });
+  });
+}
+
+// Create context menus when the extension is installed or updated
+chrome.runtime.onInstalled.addListener(() => {
+  createContextMenus();
 });
 
-function sendClipboardDataToServer(url) {
-    document.body.style.cursor = 'wait';
-    const AUTH_TOKEN = "rFMRDUF1erkUTT";
-    navigator.clipboard.readText().then((text) => {
-        const requestData = {
-            content: text
-        };
+// Also create context menus when the background script starts
+chrome.runtime.onStartup.addListener(() => {
+  createContextMenus();
+});
 
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${AUTH_TOKEN}`
-            },
-            body: JSON.stringify(requestData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            const responseString = data.response;
+// Handle context menu clicks
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+  if (info.menuItemId === 'solve-mcq') {
+    chrome.tabs.sendMessage(tab.id, { type: 'search-mcq' });
+  } else if (info.menuItemId === 'search-code') {
+    chrome.tabs.sendMessage(tab.id, { type: 'generate-code' });
+  } else if (info.menuItemId === 'search-normal') {
+    chrome.tabs.sendMessage(tab.id, { type: 'search-normal' });
+  } else if (info.menuItemId === 'copy-selected-text') {
+    chrome.tabs.sendMessage(tab.id, { type: 'copy-selected-text' });
+  } else if (info.menuItemId === 'paste-typing') {
+    chrome.tabs.sendMessage(tab.id, { type: 'simulate-paste' });
+  } else if (info.menuItemId === 'paste-swapping') {
+    chrome.tabs.sendMessage(tab.id, { type: 'paste-swapping' });
+  } else if (info.menuItemId === 'image-snip') {
+    chrome.tabs.sendMessage(tab.id, { type: 'start-snip' });
+  }
+});
 
-            navigator.clipboard.writeText(responseString).then(() => {
-                console.log("Updated clipboard content: ", responseString);
-                document.body.style.cursor = 'default';
-            }).catch(err => {
-                console.error('Failed to write to clipboard: ', err);
-                document.body.style.cursor = 'default';
-            });
-        })
-        .catch(err => {
-            console.error('Error during fetch: ', err);
-            document.body.style.cursor = 'default';
-        });
-    }).catch(err => {
-        console.error('Failed to read clipboard: ', err);
-        document.body.style.cursor = 'default';
+// Handle keyboard commands
+chrome.commands.onCommand.addListener((command) => {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    const tab = tabs[0];
+
+    if (command === "search-mcq") {
+      chrome.tabs.sendMessage(tab.id, { type: 'search-mcq' });
+    } else if (command === "search-normal") {
+      chrome.tabs.sendMessage(tab.id, { type: 'search-normal' });
+    } else if (command === "generate-code") {
+      chrome.tabs.sendMessage(tab.id, { type: 'generate-code' });
+    } else if (command === "copy-selected-text") {
+      chrome.tabs.sendMessage(tab.id, { type: 'copy-selected-text' });
+    } else if (command === "simulate-paste") {
+      chrome.tabs.sendMessage(tab.id, { type: 'simulate-paste' });
+    }
+  });
+});
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === 'selection') {
+    const rect = message.rect;
+
+    chrome.tabs.captureVisibleTab(sender.tab.windowId, { format: 'png' }, (dataUrl) => {
+      if (chrome.runtime.lastError) {
+        console.error('captureVisibleTab failed: ', chrome.runtime.lastError.message);
+        return;
+      }
+      // Send the dataUrl and rect back to the content script
+      chrome.tabs.sendMessage(sender.tab.id, { type: 'screenshot', dataUrl: dataUrl, rect: rect });
     });
-}
+  } else if (message.type === 'send-text-to-server') {
+    const text = message.text;
+    const serverUrl = message.serverUrl;
 
-function sendClipboardImageToServer() {
-    document.body.style.cursor = 'wait';
-    const AUTH_TOKEN = "rFMRDUF1erkUTT";
-    navigator.clipboard.read().then((items) => {
-        console.log('Clipboard Items:', items);
+    fetch(serverUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({ text: text })
+    })
+      .then(response => response.json())
+      .then(data => {
+        // Send the response back to the content script
+        chrome.tabs.sendMessage(sender.tab.id, { type: 'server-response', answer: data.answer });
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        chrome.tabs.sendMessage(sender.tab.id, { type: 'server-response', error: error.message });
+      });
+  } else if (message.type === 'transcribe-image') {
+    const imageData = message.imageData;
 
-        for (const item of items) {
-            console.log('Clipboard Item Types:', item.types);
-
-            if (item.types.includes('image/png')) {
-                item.getType('image/png').then((blob) => {
-                    console.log('Clipboard Image Blob:', blob);
-
-                    const formData = new FormData();
-                    formData.append('file', blob, 'clipboard-image.png');
-
-                    fetch('https://propel.ziqfm.com/image', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${AUTH_TOKEN}`
-                        },
-                        body: formData
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log("Image uploaded successfully: ", data);
-
-                        if (data.response) {
-                            const textBlob = new Blob([data.response], { type: 'text/plain' });
-                            navigator.clipboard.write([new ClipboardItem({ "text/plain": textBlob })])
-                            .then(() => {
-                                console.log("Clipboard updated with server response.");
-                            })
-                            .catch(err => {
-                                console.error("Failed to write to clipboard: ", err);
-                            });
-                        }
-
-                        document.body.style.cursor = 'default';
-                    })
-                    .catch(err => {
-                        console.error('Error during image upload: ', err);
-                        document.body.style.cursor = 'default';
-                    });
-                }).catch(err => {
-                    console.error('Failed to get image from clipboard:', err);
-                    document.body.style.cursor = 'default';
-                });
-            } else {
-                console.log('No image found in the clipboard.');
-                document.body.style.cursor = 'default';
-            }
-        }
-    }).catch(err => {
-        console.error('Failed to read clipboard:', err);
-        document.body.style.cursor = 'default';
-    });
-}
+    fetch('https://propel.ziqfm.com/transcribe_image', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({ image_data: imageData })
+    })
+      .then(response => response.json())
+      .then(data => {
+        // Send the transcription back to the content script
+        chrome.tabs.sendMessage(sender.tab.id, { type: 'image-transcription', transcription: data.transcription });
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        chrome.tabs.sendMessage(sender.tab.id, { type: 'image-transcription', error: error.message });
+      });
+  }
+});

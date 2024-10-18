@@ -16,14 +16,14 @@ function createContextMenus() {
     chrome.contextMenus.create({
       id: 'solve-mcq',
       parentId: 'propeller',
-      title: 'Solve MCQ (Alt + X)',
+      title: 'Solve MCQ',
       contexts: ['all']
     });
 
     chrome.contextMenus.create({
       id: 'search-code',
       parentId: 'propeller',
-      title: 'Search Code (Alt + G)',
+      title: 'Search Code',
       contexts: ['all']
     });
 
@@ -37,7 +37,7 @@ function createContextMenus() {
     chrome.contextMenus.create({
       id: 'copy-selected-text',
       parentId: 'propeller',
-      title: 'Copy (Alt + C)',
+      title: 'Copy',
       contexts: ['all']
     });
 
@@ -52,7 +52,7 @@ function createContextMenus() {
     chrome.contextMenus.create({
       id: 'paste-typing',
       parentId: 'paste-menu',
-      title: 'Paste clipboard by typing',
+      title: 'Paste by typing',
       contexts: ['all']
     });
 

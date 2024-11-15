@@ -1,6 +1,6 @@
 // background.js
 
-const apiKey = 'txatxA2dfoB9EOCCqkhpBYF2FhDBf08vkEbsSS6u5OWCVwnLDHjQS8oj'; // Replace with your actual API key
+const apiKey = 'NNA4rt0Zzt1cAAhVW8uE6Bm4T8NEf91nzUYdhaHOtYmx316E4zgVqy7b'; // Replace with your actual API key
 
 // Create context menu items
 function createContextMenus() {
